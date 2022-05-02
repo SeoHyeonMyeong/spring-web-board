@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
+
 @Controller
 @Slf4j
 public class ArticleController {
@@ -46,5 +48,18 @@ public class ArticleController {
 
         // 3. 보여줄 페이지 리턴
         return "articles/show";
+    }
+
+    @GetMapping("/articles")
+    public String index(Model model) {
+
+        // 1. 모든 아티클을 가져온다.
+        List<Article> articleEntityList = articleRepository.findAll();
+
+        // 2. 가져온 아티클을 모델에 등록
+        model.addAttribute("articleList", articleEntityList);
+
+        // 3. 뷰 페이지 설정
+        return "articles/index";
     }
 }
