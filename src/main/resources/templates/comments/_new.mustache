@@ -1,3 +1,54 @@
-<div>
+<div class="card m-2" id="comments-new">
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label class="form-label">닉네임</label>
+                <input class="form-control" id="new-comment-nickname">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">내용</label>
+                <textarea class="form-control" rows="3" id="new-comment-body"></textarea>
+            </div>
 
+            <!-- 히든 인풋 -->
+            {{#article}}
+            <input type="hidden" id="new-comment-article-id" value="{{id}}">
+            {{/article}}
+
+            <button type="button" class="btn btn-outline-primary btn-sm" id="comment-create-btn">댓글 작성</button>
+
+        </form>
+    </div>
 </div>
+
+<script>
+{
+    const commentCreateBtn = document.querySelector("#comment-create-btn");
+    commentCreateBtn.addEventListener("click", (e) => {
+
+        // 댓글 객체 생성
+        const comment = {
+            nickname: document.querySelector("#new-comment-nickname").value,
+            body: document.querySelector("#new-comment-body").value,
+            article_id: document.querySelector("#new-comment-article-id").value
+        };
+
+        // fetch
+        const url = "/api/articles/" + comment.article_id + "/comments";
+        fetch(url, {
+            method: "post",
+            body: JSON.stringify(comment),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            // http 응답 코드에 따른 메세지 출력
+            const msg = (response.ok) ? "댓글 작성 성공!" : "댓글 작성 실패...";
+            // alert(msg);
+
+            // 새로고침
+            window.location.reload();
+        });
+    });
+}
+</script>
