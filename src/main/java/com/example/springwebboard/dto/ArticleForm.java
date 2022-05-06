@@ -2,10 +2,12 @@ package com.example.springwebboard.dto;
 
 import com.example.springwebboard.entity.Article;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class ArticleForm {
 

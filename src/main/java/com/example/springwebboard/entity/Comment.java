@@ -1,5 +1,6 @@
 package com.example.springwebboard.entity;
 
+import com.example.springwebboard.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,20 @@ public class Comment {
 
     @Column
     private String body;
+
+    public void patch(Comment comment){
+        if (comment.nickname != null)
+            this.nickname = comment.nickname;
+        if (comment.body != null)
+            this.body = comment.body;
+    }
+
+    public static Comment create(CommentDto dto, Article article){
+        return new Comment(
+                dto.getId(),
+                article,
+                dto.getNickname(),
+                dto.getBody()
+        );
+    }
 }
