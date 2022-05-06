@@ -32,8 +32,22 @@ public class CommentApiController {
                           @RequestBody CommentDto dto) {
         CommentDto created = commentService.create(articleId, dto);
         return (created != null) ?
-                ResponseEntity.status(HttpStatus.OK).body(created) :
+                ResponseEntity.status(HttpStatus.CREATED).body(created) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+    @PatchMapping("/api/comments/{id}")
+    public ResponseEntity<CommentDto> update(@PathVariable Long id,
+                                             @RequestBody CommentDto dto){
+        CommentDto updated = commentService.update(id, dto);
+        return (updated != null) ?
+                ResponseEntity.status(HttpStatus.OK).body(updated) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @DeleteMapping("/api/comments/{id}")
+    public ResponseEntity<CommentDto> delete(@PathVariable Long id){
+        commentService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

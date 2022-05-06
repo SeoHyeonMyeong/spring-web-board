@@ -45,18 +45,13 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDto update(CommentDto dto, Long id){
-        // 게시글 조회
-        Article article = articleRepository.findById(dto.getArticleId())
-                .orElseThrow(() ->new IllegalArgumentException("댓글 수정 실패: 대상 게시물이 없습니다."));
-
-        // 댓글 객체 생성
-        Comment comment = Comment.create(dto, article);
+    public CommentDto update(Long id, CommentDto dto){
+        // 댓글 조회
         Comment target = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("댓글 수정 실패: 대상 댓글이 없습니다"));
 
         // 댓글 업데이트
-        target.patch(comment);
+        target.patch(dto);
 
         // DB에 저장
         Comment updated = commentRepository.save(target);
@@ -66,11 +61,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(Long articleId, Long id){
-        // 게시글 조회
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() ->new IllegalArgumentException("댓글 삭제 실패: 대상 게시물이 없습니다."));
-
+    public void delete(Long id){
         // 댓글 조회
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("댓글 삭제 실패: 대상 댓글이 없습니다."));
