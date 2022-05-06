@@ -49,7 +49,7 @@ class ArticleServiceTest {
     }
 
     @Test
-    void detail_failed() {
+    void detail_failed___없는_id_요청() {
         Long id = -1L;
         // 예상
         Article expected = null;
@@ -94,22 +94,65 @@ class ArticleServiceTest {
     }
 
     @Test
+    @Transactional
     void update_success() {
+        // 예상
+        Long id = 1L;
+        String title = "AAAAA";
+        String content = "1111155555";
+        ArticleForm dto = new ArticleForm(null, title, content);
+        Article expected = new Article(id, title, content);
 
+        // 실제
+        Article article = articleService.update(dto, id);
+
+        // 비교
+        assertEquals(expected.toString(), article.toString());
     }
 
     @Test
-    void update_failed___없는_객체의_id_입력() {
+    @Transactional
+    void update_failed___없는_id_요청() {
+        // 예상
+        Long id = 5L;
+        String title = "AAAAA";
+        String content = "1111155555";
+        ArticleForm dto = new ArticleForm(null, title, content);
+        Article expected = null;
 
+        // 실제
+        Article article = articleService.update(dto, id);
+
+        // 비교
+        assertEquals(expected, article);
     }
 
     @Test
+    @Transactional
     void delete_success() {
+        // 예상
+        Long id = 1L;
+        Article expected = null;
 
+        // 실제
+        Boolean success = articleService.delete(id);
+        Article article = articleService.detail(id);
+
+        // 비교
+        assertEquals(expected, article);
+        assertEquals(success, true);
     }
 
     @Test
-    void delete_failed__없는_id_입력() {
+    @Transactional
+    void delete_failed__없는_id_요청() {
+        // 예상
+        Long id = 5L;
 
+        // 실제
+        Boolean success = articleService.delete(id);
+
+        // 비교
+        assertEquals(success, false);
     }
 }
