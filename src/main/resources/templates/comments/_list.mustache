@@ -1,8 +1,101 @@
 <div class="comments-list">
     {{#commentDtos}}
         <div class="card m-3" id="comments-{{id}}">
-            <div class="card-header">{{nickname}}</div>
-            <div class="card-body">  {{body}}</div>
+            <div class="card-header">
+                {{nickname}}
+                <!-- Button trigger modal -->
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#comment-edit-modal"
+                        data-bs-id="{{id}}"
+                        data-bs-nickname="{{nickname}}"
+                        data-bs-body="{{body}}"
+                        data-bs-article-id="{{articleId}}">수정</button>
+            </div>
+            <div class="card-body">{{body}}</div>
         </div>
     {{/commentDtos}}
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="comment-edit-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">닉네임</label>
+                        <input class="form-control" id="edit-comment-nickname">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">내용</label>
+                        <textarea class="form-control" rows="3" id="edit-comment-body"></textarea>
+                    </div>
+
+                    <!-- 히든 인풋 -->
+                    {{#article}}
+                        <input type="hidden" id="edit-comment-article-id">
+                        <input type="hidden" id="edit-comment-id">
+                    {{/article}}
+
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="comment-update-btn">댓글 작성</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+{
+    // 모달 요소 선택
+    const commentEditModal = document.querySelector("#comment-edit-modal");
+
+    commentEditModal.addEventListener("show.bs.modal", function(e) {
+        var button = e.relatedTarget;
+
+        const id = button.getAttribute("data-bs-id");
+        const nickname = button.getAttribute("data-bs-nickname");
+        const body = button.getAttribute("data-bs-body");
+        const articleId = button.getAttribute("data-bs-article-id");
+
+        document.querySelector("#edit-comment-id").value = id;
+        document.querySelector("#edit-comment-nickname").value = nickname;
+        document.querySelector("#edit-comment-body").value = body;
+        document.querySelector("#edit-comment-article-id").value = articleId;
+
+    });
+    const updateBtn = document.querySelector("#comment-update-btn");
+    updateBtn.addEventListener("click", function(e) {
+        console.log("수정 요청");
+
+        const comment = {
+            id: document.querySelector("#edit-comment-id").value,
+            article_id: document.querySelector("#edit-comment-article-id").value,
+            nickname: document.querySelector("#edit-comment-nickname").value,
+            body: document.querySelector("#edit-comment-body").value
+        };
+        // fetch
+        const url = "/api/comments/" + comment.id;
+        fetch(url, {
+            method: "PATCH",
+            body: JSON.stringify(comment),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            // http 응답 코드에 따른 메세지 출력
+            const msg = (response.ok) ? "댓글 수정 성공!" : "댓글 수정 실패...";
+            // alert(msg);
+
+            // 새로고침
+            window.location.reload();
+        });
+    });
+}
+</script>
