@@ -1,14 +1,14 @@
 package com.example.springwebboard.dto;
 
 import com.example.springwebboard.entity.Article;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Getter
+@Setter
 public class ArticleForm {
 
     private Long id;
