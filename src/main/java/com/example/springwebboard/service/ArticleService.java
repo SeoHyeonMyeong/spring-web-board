@@ -2,7 +2,9 @@ package com.example.springwebboard.service;
 
 import com.example.springwebboard.dto.ArticleForm;
 import com.example.springwebboard.entity.Article;
+import com.example.springwebboard.entity.Comment;
 import com.example.springwebboard.repository.ArticleRepository;
+import com.example.springwebboard.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ public class ArticleService {
     @Autowired // DI
     private ArticleRepository articleRepository;
 
+    @Autowired // DI
+    private CommentRepository commentRepository;
+
     public List<Article> index() {
         return articleRepository.findAll();
     }
@@ -25,6 +30,12 @@ public class ArticleService {
 
     public Article create(ArticleForm dto) {
         Article article = dto.toEntity();
+        if (article.getTitle() == null) {
+            return null;
+        }
+        if (article.getContent() == null) {
+            return null;
+        }
         if (article.getId() != null) {
             return null;
         }
@@ -47,6 +58,11 @@ public class ArticleService {
         if (target == null){
             return false;
         }
+
+        List<Comment> commentList = commentRepository.findByArticleId(id);
+        commentList.forEach(comment -> {
+                            commentRepository.delete(comment);
+                        });
         articleRepository.delete(target);
         return true;
     }
