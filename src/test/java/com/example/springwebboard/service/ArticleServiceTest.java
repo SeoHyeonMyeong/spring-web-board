@@ -2,41 +2,74 @@ package com.example.springwebboard.service;
 
 import com.example.springwebboard.dto.ArticleForm;
 import com.example.springwebboard.entity.Article;
-import org.junit.jupiter.api.Test;
+import com.example.springwebboard.repository.ArticleRepository;
+import org.h2.security.auth.H2AuthConfig;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
+@TestPropertySource("classpath:application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ArticleServiceTest {
 
     @Autowired
-    ArticleService articleService;
+    private ArticleRepository articleRepository;
 
-    @Test
-    void index() {
-        // 예상
-        Article a = new Article(1L, "aaaaa", "1111");
-        Article b = new Article(2L, "bbbbb", "2222");
-        Article c = new Article(3L, "ccccc", "3333");
-        Article d = new Article(4L, "ddddd", "4444");
-        List<Article> expected = new ArrayList<Article>(Arrays.asList(a, b, c, d));
+    @Autowired
+    public ArticleService articleService;
 
-        // 실제
-        List<Article> articles = articleService.index();
+    public List<Article> articles;
+    public List<String> data = Arrays.asList("aaaaa","bbbbb","ccccc","ddddd");
+    public Long nextId;
 
-        // 비교
-        assertEquals(expected.toString(), articles.toString());
+    @BeforeAll
+    void setupData() {
+        articles = data.stream()
+                .map(item -> new ArticleForm(null, item, item))
+                .map(dto -> articleService.create(dto))
+                .collect(Collectors.toList());
+        nextId = articles.size() + 1L;
+    }
+
+    @AfterAll
+    void deleteData() {
+        articles.forEach(article -> articleService.delete(article.getId()));
     }
 
     @Test
-    void detail_success() {
+    @DisplayName("게시글 리스트")
+    void index() {
+        // given
+        List<Article> expected = articles;
+
+        // when
+        List<Article> articlelist = articleService.index();
+        List<Article> articles = articlelist.stream()
+                .skip(articlelist.size() - expected.size())
+                .collect(Collectors.toList());
+
+        // then
+        assertEquals(expected.toString(), articles.toString());
+        System.out.println(expected.toString());
+        System.out.println(articles.toString());
+    }
+
+    @Test
+    @DisplayName("게시글 상세")
+    void detail() {
         Long id = 1L;
         // 예상
         Article expected = new Article(id, "aaaaa", "1111");
@@ -49,7 +82,8 @@ class ArticleServiceTest {
     }
 
     @Test
-    void detail_failed___없는_id_요청() {
+    @DisplayName("게시글 상세___없는 ID")
+    void detailWrongId() {
         Long id = -1L;
         // 예상
         Article expected = null;
@@ -63,12 +97,14 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
-    void create_success() {
+    @DisplayName("게시글 생성")
+    void create() {
         // 예상
-        String title = "";
-        String content = "";
+        Long id = nextId;
+        String title = "eeeee";
+        String content = "55555";
         ArticleForm dto = new ArticleForm(null, title, content);
-        Article expected = new Article(5L, title, content);
+        Article expected = new Article(nextId, title, content);
 
         // 실제
         Article article = articleService.create(dto);
@@ -79,11 +115,13 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
-    void create_failed___id가_포함된_dto_입력() {
+    @DisplayName("게시글 생성___없는_ID")
+    void createWrongArticle() {
         // 예상
+        Long id = -1L;
         String title = "eeeee";
-        String content = "5555";
-        ArticleForm dto = new ArticleForm(5L, title, content);
+        String content = "55555";
+        ArticleForm dto = new ArticleForm(id, title, content);
         Article expected = null;
 
         // 실제
@@ -95,9 +133,10 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
-    void update_success() {
+    @DisplayName("게시글 수정")
+    void update() {
         // 예상
-        Long id = 1L;
+        Long id = nextId;
         String title = "AAAAA";
         String content = "1111155555";
         ArticleForm dto = new ArticleForm(null, title, content);
@@ -112,9 +151,10 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
+    @DisplayName("게시글 수정___없는 ID")
     void update_failed___없는_id_요청() {
         // 예상
-        Long id = 5L;
+        Long id = -1L;
         String title = "AAAAA";
         String content = "1111155555";
         ArticleForm dto = new ArticleForm(null, title, content);
@@ -129,7 +169,8 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
-    void delete_success() {
+    @DisplayName("게시글 삭제")
+    void delete() {
         // 예상
         Long id = 1L;
         Article expected = null;
@@ -145,9 +186,10 @@ class ArticleServiceTest {
 
     @Test
     @Transactional
-    void delete_failed__없는_id_요청() {
+    @DisplayName("게시글 삭제___없는 ID")
+    void deleteWrongId() {
         // 예상
-        Long id = 5L;
+        Long id = -1L;
 
         // 실제
         Boolean success = articleService.delete(id);

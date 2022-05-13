@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -28,6 +29,7 @@ public class ArticleService {
         return articleRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public Article create(ArticleForm dto) {
         Article article = dto.toEntity();
         if (article.getTitle() == null) {
@@ -42,6 +44,7 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
+    @Transactional
     public Article update(ArticleForm dto, Long id) {
         Article article = dto.toEntity();
         Article target = articleRepository.findById(id).orElse(null);
@@ -53,6 +56,7 @@ public class ArticleService {
         return updated;
     }
 
+    @Transactional
     public Boolean delete(Long id){
         Article target = articleRepository.findById(id).orElse(null);
         if (target == null){
