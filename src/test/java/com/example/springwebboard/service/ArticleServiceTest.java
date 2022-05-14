@@ -41,7 +41,7 @@ class ArticleServiceTest {
                 .map(item -> new ArticleForm(null, item, item))
                 .map(dto -> articleService.create(dto))
                 .collect(Collectors.toList());
-        nextId = articles.size() + 1L;
+        nextId = articles.get(articles.size() - 1).getId() + 1L;
     }
 
     @AfterAll
@@ -136,7 +136,7 @@ class ArticleServiceTest {
     @DisplayName("게시글 수정")
     void update() {
         // 예상
-        Long id = nextId;
+        Long id = articles.get(0).getId();
         String title = "AAAAA";
         String content = "1111155555";
         ArticleForm dto = new ArticleForm(null, title, content);
